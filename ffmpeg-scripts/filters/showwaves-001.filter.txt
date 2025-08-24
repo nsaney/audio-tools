@@ -1,0 +1,36 @@
+# apply showwaves to first audio stream
+[0:a]showwaves=
+
+# set output size 
+
+s=1280x120
+
+# line/point/p2p/cline
+:mode=line
+
+# separate channels by |
+:colors=0xff0000
+
+# scale (other: log, sqrt)
+:scale=lin
+
+# pixel format (other: 
+,format=yuv420p
+
+# pad to SHD
+,pad=1280:720
+
+[v0]
+
+;
+
+[0:a]showwaves=s=1280x120:mode=point:colors=0x00ff00:scale=lin,format=yuv420p[v1];
+[0:a]showwaves=s=1280x120:mode=p2p:colors=0x7f7fff:scale=lin,format=yuv420p[v2];
+[0:a]showwaves=s=1280x120:mode=cline:colors=0xffff00:scale=lin,format=yuv420p[v3];
+[0:a]showwaves=s=1280x120:mode=cline:colors=0xff00ff:scale=log,format=yuv420p[v4];
+[0:a]showwaves=s=1280x120:mode=cline:colors=0x7fffff|0xff7f7f:scale=log,format=yuv420p[v5];
+[v0][v1]overlay=0:h[cv1];
+[cv1][v2]overlay=0:h*2[cv2];
+[cv2][v3]overlay=0:h*3[cv3];
+[cv3][v4]overlay=0:h*4[cv4];
+[cv4][v5]overlay=0:h*5

@@ -1,0 +1,18 @@
+# apply showspectrum to first audio stream
+[0:a]showspectrum
+
+# set output size to SHD
+=s=1280x720
+
+# combine audio channels (other: separate)
+:mode=combined
+
+# spectrum color based on intensity (other: channel, magnitude)
+:color=intensity
+
+# scale (other: linear, sqrt)
+:scale=log
+
+# pixel format (other: 
+,format=yuv420p
+
