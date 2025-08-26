@@ -1,0 +1,41 @@
+# apply showfreqs to first audio stream
+[0:a]showfreqs=
+
+# set output size
+s=1280x120
+
+# line/bar/dot/pipe
+:mode=pipe
+
+# separate channels by |
+:colors=0xff7f7f|0x7fffff
+
+# cmode (other: separate)
+:cmode=separate
+
+# ascale (other: lin, sqrt, cbrt)
+:ascale=log
+
+# fscale (other: lin, rlog)
+:fscale=log
+
+# chain to: pixel format
+,format=yuv420p
+
+# chain to: pad to SHD
+,pad=1280:720
+
+[v0]
+
+;
+
+[0:a]showfreqs=s=1280x120:mode=bar:colors=0x00ff00|0x7f7fff:ascale=log:fscale=log,format=yuv420p[v1];
+[0:a]showfreqs=s=1280x120:mode=dot:colors=0x7f7fff|0xff00ff:ascale=log:fscale=log,format=yuv420p[v2];
+[0:a]showfreqs=s=1280x120:mode=pipe:colors=0xffff7f|0x7f7fff:ascale=log:fscale=log,format=yuv420p[v3];
+[0:a]showfreqs=s=1280x120:mode=line:colors=0xff00ff|0x7fff7f:cmode=combined,format=yuv420p[v4];
+[0:a]showfreqs=s=1280x120:mode=line:colors=0x7fffff|0xff7f7f:cmode=separate,format=yuv420p[v5];
+[v0][v1]overlay=0:h[cv1];
+[cv1][v2]overlay=0:h*2[cv2];
+[cv2][v3]overlay=0:h*3[cv3];
+[cv3][v4]overlay=0:h*4[cv4];
+[cv4][v5]overlay=0:h*5
