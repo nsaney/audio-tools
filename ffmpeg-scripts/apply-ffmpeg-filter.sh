@@ -8,6 +8,9 @@ if [ "$#" -lt 3 ]; then
   exit 1
 fi
 
+LOG_DIR="out/logs"
+mkdir -p "${LOG_DIR}"
+
 FILTER_FILE="$1"
 INPUT_FILE="$2"
 OUTPUT_FILE="$3"
@@ -32,7 +35,8 @@ case "${yn}" in
   *) exit 0 ;;
 esac
 
+LOG_FILE="${LOG_DIR}/apply-ffmpeg-filter-$(date -Is | tr -d ':-' | head -c -5)--${OUTPUT_FILE/\//--}.log.txt"
 echo ''
-env time -p "${FFMPEG_CMD[@]}"
+(set -x; env time -p "${FFMPEG_CMD[@]}") 2>&1 | tee "${LOG_FILE}"
 
 )
