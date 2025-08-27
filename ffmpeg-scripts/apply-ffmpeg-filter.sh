@@ -14,6 +14,8 @@ mkdir -p "${LOG_DIR}"
 FILTER_FILE="$1"
 INPUT_FILE="$2"
 OUTPUT_FILE="$3"
+shift; shift; shift
+FFMPEG_EXTRA_ARGS=("$@")
 FFMPEG_FILTER_NAME='[FINAL]'
 FFMPEG_FILTER="$(< "${FILTER_FILE}" perl -pe 's/#.*$//g' | tr -d '\n')"
 FFMPEG_FILTER="${FFMPEG_FILTER}${FFMPEG_FILTER_NAME}"
@@ -22,7 +24,8 @@ FFMPEG_CMD=(
          -filter_complex "${FFMPEG_FILTER}" \
          -map "${FFMPEG_FILTER_NAME}" \
          -map 0:a \
-         "${OUTPUT_FILE}"
+         "${OUTPUT_FILE}" \
+         "${FFMPEG_EXTRA_ARGS[@]}"
 )
 
 echo "Command to run:"
