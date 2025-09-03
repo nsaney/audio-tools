@@ -5,7 +5,8 @@ s=1366x256
 :cmode=separate
 :ascale=log
 :fscale=lin
-:win_size=256
+:win_size=683
+:pipe_min_width=1
 ,format=yuv420p
 ,pad=1366:768:0:0
 [v0];
@@ -17,20 +18,23 @@ s=1366x256
 :cmode=separate
 :ascale=log
 :fscale=log
-:win_size=256
+:win_size=683
+:pipe_border_color=0x3f3f3f
+:pipe_padding_color=0xffffff
 ,format=yuv420p
 [v1];
 
 [0:a]showfreqs=
-s=1366x256
-:mode=bar
+s=1366x128
+:mode=pipe
 :colors=0xff007f|0x7f7fff
-:cmode=separate
+:cmode=combined
 :ascale=log
 :fscale=log
-:win_size=256
+:win_size=683
+:pipe_min_width=1
 ,format=yuv420p
 [v2];
 
-[v0][v1]overlay=0:h[o1];
-[o1][v2]overlay=0:2*h
+[v0][v1]overlay=0:H/3[o1];
+[o1][v2]overlay=0:2*H/3
