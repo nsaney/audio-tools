@@ -18,6 +18,26 @@ OUTPUT_VIDEO_DIR="$(readlink -f "${LINKS_DIR}/output-video-dir")"
 
 OUTPUT_VIDEO_FILE="${OUTPUT_VIDEO_DIR}/${PROJECT_NAME}--${TIMESTAMP}.mp4"
 
+INPUT_AUDIO_METADATA="$(ffprobe -v quiet "${INPUT_AUDIO_FILE}" -of json -show_format | jq '.format.tags')"
+INPUT_AUDIO_SOFTWARE="$(echo "${INPUT_AUDIO_METADATA}" | jq '.Software // ""' -r)"
+FFMPEG_VERSION="$(ffmpeg -version | head -n 1 | grep -oP '(?<=version )[^ ]*')"
+OUTPUT_VIDEO_SOFTWARE=''
+if [ -n "${FFMPEG_VERSION}" ]; then
+  RENDER_SOFTWARE="FFmpeg (${FFMPEG_VERSION})"
+  if [ -n "${INPUT_AUDIO_SOFTWARE}" ]; then
+    OUTPUT_VIDEO_SOFTWARE="${INPUT_AUDIO_SOFTWARE}, ${RENDER_SOFTWARE}"
+  else
+    OUTPUT_VIDEO_SOFTWARE="${RENDER_SOFTWARE}"
+  fi
+else
+  OUTPUT_VIDEO_SOFTWARE="${INPUT_AUDIO_SOFTWARE}"
+fi
+OUTPUT_VIDEO_SOFTWARE_TAG_ARGS=()
+if [ -n "${OUTPUT_VIDEO_SOFTWARE}" ]; then
+  OUTPUT_VIDEO_SOFTWARE_TAG_ARGS=(-metadata "Software=${OUTPUT_VIDEO_SOFTWARE}")
+fi
+
+
 FFMPEG_RENDER_SCRIPT="${SCRIPT_DIR}/../../ffmpeg/scripts/ffmpeg-with-commented-filter.sh"
 FFMPEG_RENDER_SCRIPT="$(readlink -f "${FFMPEG_RENDER_SCRIPT}")"
 RENDER_SCRIPT_COMMAND=(
@@ -29,6 +49,7 @@ RENDER_SCRIPT_COMMAND=(
   -c:a copy
   -map_metadata 0
   -movflags use_metadata_tags
+  "${OUTPUT_VIDEO_SOFTWARE_TAG_ARGS[@]}"
   -shortest
   "${EXTRA_FFMPEG_ARGS[@]}"
   "${OUTPUT_VIDEO_FILE}"
