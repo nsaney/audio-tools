@@ -14,7 +14,7 @@ INPUT_IMAGE_FILE="${SCRIPT_DIR}/links/input-image-file"
 OUTPUT_VIDEO_DIR="${SCRIPT_DIR}/links/output-video-dir"
 OUTPUT_VIDEO_FILE="${OUTPUT_VIDEO_DIR}/project-001--twoson--${TIMESTAMP}.mp4"
 
-FFMPEG_RENDER_SCRIPT="${SCRIPT_DIR}/../../ffmpeg-with-commented-filter.sh"
+FFMPEG_RENDER_SCRIPT="${SCRIPT_DIR}/../../ffmpeg/scripts/ffmpeg-with-commented-filter.sh"
 FFMPEG_RENDER_SCRIPT="$(readlink -f "${FFMPEG_RENDER_SCRIPT}")"
 RENDER_SCRIPT_COMMAND=(
   "${FFMPEG_RENDER_SCRIPT}"
