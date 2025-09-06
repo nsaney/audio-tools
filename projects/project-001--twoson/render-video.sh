@@ -4,15 +4,19 @@
 SCRIPT_FILE="${BASH_SOURCE[0]}"
 SCRIPT_DIR="$(dirname "${SCRIPT_FILE}" | tr '\n' '\0' | xargs -0 readlink -f)"
 
-TIMESTAMP="$(date -Is | tr -d ':-' | head -c -5)"
+PROJECT_NAME="$(basename "${SCRIPT_DIR}")"
+TIMESTAMP="$(date -Is | tr -d ':-' | tr 'T' '\-' | head -c -5)"
+
+EXTRA_FFMPEG_ARGS=("$@")
 
 FILTER_SCRIPT_FILE="${SCRIPT_DIR}/filter.txt"
 
-INPUT_AUDIO_FILE="${SCRIPT_DIR}/links/input-audio-file"
-INPUT_IMAGE_FILE="${SCRIPT_DIR}/links/input-image-file"
+LINKS_DIR="${SCRIPT_DIR}/links"
+INPUT_AUDIO_FILE="$(readlink -f "${LINKS_DIR}/input-audio-file")"
+INPUT_IMAGE_FILE="$(readlink -f "${LINKS_DIR}/input-image-file")"
+OUTPUT_VIDEO_DIR="$(readlink -f "${LINKS_DIR}/output-video-dir")"
 
-OUTPUT_VIDEO_DIR="${SCRIPT_DIR}/links/output-video-dir"
-OUTPUT_VIDEO_FILE="${OUTPUT_VIDEO_DIR}/project-001--twoson--${TIMESTAMP}.mp4"
+OUTPUT_VIDEO_FILE="${OUTPUT_VIDEO_DIR}/${PROJECT_NAME}--${TIMESTAMP}.mp4"
 
 FFMPEG_RENDER_SCRIPT="${SCRIPT_DIR}/../../ffmpeg/scripts/ffmpeg-with-commented-filter.sh"
 FFMPEG_RENDER_SCRIPT="$(readlink -f "${FFMPEG_RENDER_SCRIPT}")"
@@ -23,7 +27,10 @@ RENDER_SCRIPT_COMMAND=(
   -commented-filter "${FILTER_SCRIPT_FILE}"
   -map 0:a
   -c:a copy
+  -map_metadata 0
+  -movflags use_metadata_tags
   -shortest
+  "${EXTRA_FFMPEG_ARGS[@]}"
   "${OUTPUT_VIDEO_FILE}"
 )
 env "${RENDER_SCRIPT_COMMAND[@]}"
