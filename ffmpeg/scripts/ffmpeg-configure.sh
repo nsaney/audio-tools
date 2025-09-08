@@ -1,11 +1,13 @@
 #!/bin/bash
 
 time (
-if [ "$(<configure sha256sum)" != 'c19f2856f7b355db3ef1fc5d9de85f31b6c62da7fca71c197be7988523d482b1  -' ]; then
+if [ ! -x configure ] || [ ! -f Makefile ] || [ ! -d .git ] || [ ! -x ffbuild/version.sh ]; then
   exec 1>&2
-  echo "Could not find configure script. Not in the correct directory: ${PWD}"
+  echo "This does not seem to be an ffmpeg directory: ${PWD}"
   exit 1
 fi
+set -x
+# adapted from https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu#FFmpeg
 BIN_DIR="$PWD/.bin"
 BUILD_DIR="$PWD/.build"
 #            --enable-libfdk-aac \
@@ -31,7 +33,4 @@ env PATH="$BIN_DIR:$PATH" PKG_CONFIG_PATH="$BUILD_DIR/lib/pkgconfig" \
             --enable-libdav1d \
             --enable-libvorbis \
             --enable-libx264 \
-&& env PATH="$BIN_DIR:$PATH" make \
-&& make install \
-&& hash -r
 )
