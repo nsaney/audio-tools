@@ -37,3 +37,4 @@ s=1024x240
 [v0][v1]overlay=0:0[w1];
 [w1][v2]overlay=W-w:0
 ,format=yuv420p
+[VOUT];

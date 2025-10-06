@@ -12,24 +12,19 @@ LOG_DIR="out/logs"
 mkdir -p "${LOG_DIR}"
 
 FFMPEG_ARGS=()
-NEXT_COMMENTED_FILTER_ID=1
-COMMENTED_FILTER_NAME_FORMAT='[CFOUT%i]'
 while [[ "$#" -gt 0 ]]; do
-  if [ "$1" == '-commented-filter' ]; then
-    FILTER_FILE="$2"
-    shift; shift
-    FILTER_ID="${NEXT_COMMENTED_FILTER_ID}"; (( NEXT_COMMENTED_FILTER_ID += 1 ))
-    FILTER_NAME="$(printf "${COMMENTED_FILTER_NAME_FORMAT}" "${FILTER_ID}")"
+  ARG="$1"; shift
+  if [ "${ARG}" == '-commented-filter' ]; then
+    FILTER_FILE="$1"; shift
     FILTER_TEXT="$(< "${FILTER_FILE}" perl -pe 's/#.*$//g' | tr -d '\n')"
-    FILTER_TEXT="${FILTER_TEXT}${FILTER_NAME}"
+    FILTER_NAME="$(echo "${FILTER_TEXT}" | tail -n1 | grep -oP '\[[^\]]*\](?=;$)')"
     FFMPEG_ARGS=(
       "${FFMPEG_ARGS[@]}"
       -filter_complex "${FILTER_TEXT}"
       -map "${FILTER_NAME}"
     )
   else
-    FFMPEG_ARGS=("${FFMPEG_ARGS[@]}" "$1")
-    shift
+    FFMPEG_ARGS=("${FFMPEG_ARGS[@]}" "${ARG}")
   fi
 done
 
