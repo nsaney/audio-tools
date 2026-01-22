@@ -4,18 +4,30 @@
 SCRIPT_FILE="${BASH_SOURCE[0]}"
 SCRIPT_DIR="$(dirname "${SCRIPT_FILE}" | tr '\n' '\0' | xargs -0 readlink -f)"
 
-PROJECT_NAME="$(basename "${SCRIPT_DIR}")"
+PROJECT_DIR="$1"; shift
+PROJECT_DIR="$(readlink -f "${PROJECT_DIR}")"
+if [ ! -d "${PROJECT_DIR}" ]; then
+  1>&2 echo "Project directory not found: ${PROJECT_DIR}"
+  exit 1
+fi
+
+INPUT_AUDIO_FILE="$(ls "${PROJECT_DIR}"/in* | sort | head -n 1)"
+if [ ! -f "${INPUT_AUDIO_FILE}" ]; then
+  1>&2 echo "Input audio file not found: ${INPUT_AUDIO_FILE}"
+  exit 1
+fi
+
+OUTPUT_VIDEO_DIR="${PROJECT_DIR}/out"
+if [ ! -d "${OUTPUT_VIDEO_DIR}" ]; then
+  1>&2 echo "Output video directory not found: ${OUTPUT_VIDEO_DIR}"
+  exit 1
+fi
+
 TIMESTAMP="$(date -Is | tr -d ':-' | tr 'T' '\-' | head -c -5)"
-
-EXTRA_FFMPEG_ARGS=("$@")
-
+PROJECT_NAME="$(basename "${PROJECT_DIR}")"
 FILTER_SCRIPT_FILE="${SCRIPT_DIR}/filter.txt"
-
-LINKS_DIR="${SCRIPT_DIR}/links"
-INPUT_AUDIO_FILE="${LINKS_DIR}/input-audio-file"
-OUTPUT_VIDEO_DIR="$(readlink -f "${LINKS_DIR}/output-video-dir")"
-
 OUTPUT_VIDEO_FILE="${OUTPUT_VIDEO_DIR}/${PROJECT_NAME}--${TIMESTAMP}.mp4"
+EXTRA_FFMPEG_ARGS=("$@")
 
 INPUT_AUDIO_METADATA="$(ffprobe -v quiet "${INPUT_AUDIO_FILE}" -of json -show_format | jq '.format.tags')"
 INPUT_AUDIO_SOFTWARE="$(echo "${INPUT_AUDIO_METADATA}" | jq '.Software // ""' -r)"
