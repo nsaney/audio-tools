@@ -33,7 +33,7 @@ FFMPEG_CMD=(ffmpeg "${FFMPEG_ARGS[@]}")
 echo "Command to run:"
 echo ''
 echo -n '::'
-printf ' %q' "${FFMPEG_CMD[@]}" | perl -pe 's/ -/\n    -/g'
+printf ' %q' "${FFMPEG_CMD[@]}" | perl -pe 's/(?<!\\) -/\n    -/g'
 echo ''
 echo ''
 echo -n 'Continue? [y]es or no: '
